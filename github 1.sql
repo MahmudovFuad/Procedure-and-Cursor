@@ -45,7 +45,32 @@ select distinct product_name from product
 
 declare @t table (city nvarchar(100),PRODUCT_NAMES nvarchar(100),NUMBER decimal(18,3))
 
-declare @PRODUCT_NAMES nvarchar(100)declare cursor_results Cursor forselect PRODUCT_NAMES from @x ----opening cursor open cursor_results fetch next from cursor_results into @PRODUCT_NAMES while @@FETCH_STATUS=0begininsert into @t (city,PRODUCT_NAMES,NUMBER)select city,product_name ,sum(price) as cem from product where product_name=@PRODUCT_NAMES and (production_date between @start_date and @finish_date)group by product_name,cityfetch next from cursor_results into @PRODUCT_NAMES end---closing cursorclose cursor_results;deallocate cursor_results;
+declare @PRODUCT_NAMES nvarchar(100)
+
+declare cursor_results Cursor for
+
+select PRODUCT_NAMES from @x
+
+ ----opening cursor 
+ 
+open cursor_results 
+
+fetch next from cursor_results into @PRODUCT_NAMES 
+
+while @@FETCH_STATUS=0
+
+begin
+
+insert into @t (city,PRODUCT_NAMES,NUMBER)
+select city,product_name ,sum(price) as cem from product 
+where product_name=@PRODUCT_NAMES and (production_date between @start_date and @finish_date)
+group by product_name,city
+
+fetch next from cursor_results into @PRODUCT_NAMES 
+end
+---closing cursor
+close cursor_results;
+deallocate cursor_results;
 
 select * from @t
 END
